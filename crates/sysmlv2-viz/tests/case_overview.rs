@@ -18,6 +18,7 @@ const SRC: &str = "package P {
     }
     view overview : Overview { expose P::*; }
     package Empty { part def X; }
+    package Anon { use case def F { subject; actor; } }
 }
 ";
 
@@ -162,4 +163,12 @@ fn rendering_selects_case_overview() {
             .expect("case resolves");
         assert!(exposed.contains(&def), "{case} not exposed");
     }
+}
+
+#[test]
+fn anonymous_parties_get_placeholders() {
+    let out = render_with("P::Anon", VizOptions::default());
+    assert_eq!(count(&out, "rectangle \"(subject)\""), 1, "{out}");
+    assert_eq!(count(&out, "actor \"(actor)\""), 1, "{out}");
+    assert!(!out.contains("\"\""), "{out}");
 }

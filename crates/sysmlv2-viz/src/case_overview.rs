@@ -144,7 +144,13 @@ fn party(r: &mut ResolvedModel, opts: &VizOptions, m: ElementRef, all: &mut Vec<
         ),
         None => {
             let name = r.element_name(m).unwrap_or("").to_string();
-            (Key::Name(name.clone()), name, link_suffix(r, opts, m))
+            let label = match name.as_str() {
+                "" if r.owning_membership_type(m) == Some("SubjectMembership") => "(subject)",
+                "" => "(actor)",
+                _ => &name,
+            }
+            .to_string();
+            (Key::Name(name), label, link_suffix(r, opts, m))
         }
     };
     if let Some(k) = all.iter().position(|p| p.key == key) {

@@ -1524,7 +1524,7 @@ n2 ->> n3 : deliver_message
 
 The **case** view is a use-case diagram: case-family definitions and usages as `usecase` nodes, `actor` members with association edges, subjects as `<<subject>>` rectangles, objectives as attached notes carrying their doc bodies, and `include` references as `«include»` edges.
 
-The **case-overview** view is the classic use case diagram, laid out left to right: the use case definitions in reach as `usecase` nodes inside one rectangle per subject type, each actor type once outside the rectangles, and one line per actor type and use case. A use case without a subject stands outside the rectangles; an untyped subject or actor is keyed by its name. There are no objective or doc notes. An `--element` view whose rendering is `asClassicUseCaseDiagram` selects this view.
+The **case-overview** view is the classic use case diagram, laid out left to right: the use case definitions in reach as `usecase` nodes inside one rectangle per subject type, each actor type once outside the rectangles, and one line per actor type and use case. A use case without a subject stands outside the rectangles; an untyped subject or actor is keyed by its name, and one without a name shows `(subject)` or `(actor)`. There are no objective or doc notes. An `--element` view whose rendering is `asClassicUseCaseDiagram` selects this view.
 
 ```console
 $ printf 'package Shop {
