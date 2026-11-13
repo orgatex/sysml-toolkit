@@ -1233,11 +1233,12 @@ impl Session {
             "action" => sysmlv2_viz::View::Action,
             "sequence" | "seq" => sysmlv2_viz::View::Sequence,
             "case" => sysmlv2_viz::View::Case,
+            "case-overview" => sysmlv2_viz::View::CaseOverview,
             "context" => sysmlv2_viz::View::Context,
             "mixed" => sysmlv2_viz::View::Mixed,
             other => {
                 return Err(refused(format!(
-                    "unknown view: {other} (expected tree, interconnection, state, action, sequence, case, context, or mixed)"
+                    "unknown view: {other} (expected tree, interconnection, state, action, sequence, case, case-overview, context, or mixed)"
                 )));
             }
         };
