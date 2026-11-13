@@ -17,6 +17,7 @@ const SRC: &str = "package P {
         render asClassicUseCaseDiagram;
     }
     view overview : Overview { expose P::*; }
+    view none : Overview { expose P::Empty; }
     package Empty { part def X; }
     package Anon { use case def F { subject; actor; } }
 }
@@ -171,4 +172,20 @@ fn anonymous_parties_get_placeholders() {
     assert_eq!(count(&out, "rectangle \"(subject)\""), 1, "{out}");
     assert_eq!(count(&out, "actor \"(actor)\""), 1, "{out}");
     assert!(!out.contains("\"\""), "{out}");
+}
+
+#[test]
+fn view_without_use_cases_is_empty() {
+    let mut r = resolved();
+    let view = r.resolve_qualified("P::none").expect("view resolves");
+    let (style, exposed) = view_directed(&mut r, view).expect("a view usage");
+    assert_eq!(style, Some(View::CaseOverview));
+    let opts = VizOptions::default()
+        .with_view(View::CaseOverview)
+        .with_roots(Some(exposed));
+    let out = plantuml(&mut r, None, &opts);
+    assert!(out.starts_with("@startuml\n"), "{out}");
+    assert!(out.ends_with("@enduml\n"), "{out}");
+    assert_eq!(count(&out, "usecase"), 0, "{out}");
+    assert_eq!(count(&out, "rectangle"), 0, "{out}");
 }
