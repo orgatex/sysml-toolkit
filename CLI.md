@@ -1394,7 +1394,7 @@ What stays undecided is honestly undecided — a contingent constraint reports a
 
 ## 13. `viz` — PlantUML diagrams
 
-`viz` renders one view of a model as PlantUML text (`--view tree|interconnection|state|action|sequence|case|context|mixed`, default `tree`; `ic` and `seq` are accepted short spellings). Feed the output to any PlantUML build for SVG/PNG; the toolkit itself has no rendering stage.
+`viz` renders one view of a model as PlantUML text (`--view tree|interconnection|state|action|sequence|case|case-overview|context|mixed`, default `tree`; `ic` and `seq` are accepted short spellings). Feed the output to any PlantUML build for SVG/PNG; the toolkit itself has no rendering stage.
 
 The **tree** view is the structure diagram: packages, definitions, and usages with attribute compartments, plus composition (`*--`), typing (`..>`), and specialization (`--|>`) edges.
 
@@ -1523,6 +1523,26 @@ n2 ->> n3 : deliver_message
 ```
 
 The **case** view is a use-case diagram: case-family definitions and usages as `usecase` nodes, `actor` members with association edges, subjects as `<<subject>>` rectangles, objectives as attached notes carrying their doc bodies, and `include` references as `«include»` edges.
+
+The **case-overview** view is the classic use case diagram, laid out left to right: the use case definitions in reach as `usecase` nodes inside one rectangle per subject type, each actor type once outside the rectangles, and one line per actor type and use case. A use case without a subject stands outside the rectangles; an untyped subject or actor is keyed by its name. There are no objective or doc notes. An `--element` view whose rendering is `asClassicUseCaseDiagram` selects this view.
+
+```console
+$ printf 'package Shop {
+    part def Store; part def Buyer;
+    use case def Order { subject s : Store; actor b : Buyer; }
+    use case def Pay { subject s : Store; actor b : Buyer; }
+}' | $sysmlv2 viz - --view case-overview --element Shop
+@startuml
+left to right direction
+rectangle "Store" as s1 {
+  usecase "Order" as n1 <<use case def>>
+  usecase "Pay" as n2 <<use case def>>
+}
+actor "Buyer" as a1
+a1 -- n1
+a1 -- n2
+@enduml
+```
 
 The **context** view is a system context diagram: the part usages of a context as rectangles (its own, then those of its definitions or written generals; a redefinition keeps one node), the part with the most connections in the centre (`<<system>>`, the first declared on a tie), and each two-ended connector between two different parts as one edge labelled by its definition, else by its name. Ports stay off the diagram: an end attaches to the part its feature chain starts at. The centre's neighbours take `-up-` and `-down-` in turn, which places the other parts in one row above and one row below it; the stereotypes stay hidden, and a bold border marks the centre.
 

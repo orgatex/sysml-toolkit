@@ -1,6 +1,6 @@
 //! PlantUML emission for SysML v2 / KerML models.
 //!
-//! Eight views over the resolved model, all deterministic (aliases in
+//! Nine views over the resolved model, all deterministic (aliases in
 //! declaration order) and all tolerant of unresolved references:
 //!
 //! - **Tree** (structure) — packages as `package` blocks,
@@ -26,6 +26,9 @@
 //! - **Case** (`case`) — the use-case diagram: `usecase` nodes,
 //!   actors, `<<subject>>` rectangles, objectives as notes,
 //!   `«include»` edges.
+//! - **Case overview** (`case-overview`) — the classic use case
+//!   diagram: one boundary per subject type, each actor type once, one
+//!   line per actor and use case, no notes.
 //! - **Context** (`context`) — the system context diagram: the parts
 //!   of a context as nodes around the most connected one, connectors as
 //!   edges labelled by their definition, no ports.
@@ -48,6 +51,7 @@
 
 mod behavior;
 mod case;
+mod case_overview;
 mod context;
 mod graph;
 mod interconnect;
@@ -103,6 +107,10 @@ pub enum View {
     Sequence,
     /// Use cases: actors, subjects, objectives, includes.
     Case,
+    /// Classic use case diagram: one boundary per subject type, actors
+    /// once.
+    #[serde(rename = "case-overview")]
+    CaseOverview,
     /// System context: parts as nodes around the most connected one,
     /// connectors as labelled edges, no ports.
     Context,
@@ -120,6 +128,7 @@ impl View {
         ("action", View::Action),
         ("sequence", View::Sequence),
         ("case", View::Case),
+        ("case-overview", View::CaseOverview),
         ("context", View::Context),
         ("mixed", View::Mixed),
     ];
@@ -140,6 +149,7 @@ impl View {
             View::Action => "action",
             View::Sequence => "sequence",
             View::Case => "case",
+            View::CaseOverview => "case-overview",
             View::Context => "context",
             View::Mixed => "mixed",
         }
@@ -476,6 +486,7 @@ pub fn view_directed(
     let style = match r.view_rendering(view).as_deref() {
         Some("asTreeDiagram") => Some(View::Tree),
         Some("asInterconnectionDiagram") => Some(View::Interconnection),
+        Some("asClassicUseCaseDiagram") => Some(View::CaseOverview),
         _ => None,
     };
     let exposed = r.view_exposed_elements(view);
@@ -662,6 +673,7 @@ pub fn plantuml(r: &mut ResolvedModel, root: Option<ElementRef>, opts: &VizOptio
         View::Action => behavior::emit(r, &tops, opts, View::Action),
         View::Sequence => sequence::emit(r, &tops, opts),
         View::Case => case::emit(r, &tops, opts),
+        View::CaseOverview => case_overview::emit(r, &tops, opts),
         View::Context => context::emit(r, &tops, opts),
         View::Mixed => interconnect::emit(r, &tops, opts, true),
     }

@@ -1,6 +1,6 @@
 # sysmlv2-viz
 
-PlantUML emission for OMG SysML v2 / KerML models, over the [sysmlv2](https://github.com/Open-MBEE/sysml-toolkit) toolkit's resolved model. Eight deterministic views, each tolerant of unresolved references — feed the text to any PlantUML build for SVG/PNG; this crate has no rendering stage of its own.
+PlantUML emission for OMG SysML v2 / KerML models, over the [sysmlv2](https://github.com/Open-MBEE/sysml-toolkit) toolkit's resolved model. Nine deterministic views, each tolerant of unresolved references — feed the text to any PlantUML build for SVG/PNG; this crate has no rendering stage of its own.
 
 | View | Renders |
 |---|---|
@@ -10,6 +10,7 @@ PlantUML emission for OMG SysML v2 / KerML models, over the [sysmlv2](https://gi
 | `action` | action flows: actions, fork/join/choice control nodes, successions, dashed payload-labelled flows |
 | `sequence` | lifelines and `->>` messages, ordered by the events' succession partial order, boxed per owning definition |
 | `case` | use cases: actors, `<<subject>>` rectangles, objectives as notes, `«include»` edges |
+| `case-overview` | classic use case diagram: one boundary per subject type, each actor type once, no notes |
 | `context` | system context: parts around the most connected one, edges labelled by connector definition, no ports |
 | `mixed` | everything on one canvas: structure, connectors, behavior edges, cases, typing |
 

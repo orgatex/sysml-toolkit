@@ -593,6 +593,9 @@ pub enum DiagramView {
     Sequence,
     /// Use cases: actors, subjects, objectives, «include» edges
     Case,
+    /// Classic use case diagram: one boundary per subject type, actors
+    /// once
+    CaseOverview,
     /// System context: parts around the most connected one, labelled
     /// connector edges, no ports
     Context,
@@ -611,6 +614,7 @@ impl From<DiagramView> for sysmlv2_viz::View {
             DiagramView::Action => sysmlv2_viz::View::Action,
             DiagramView::Sequence => sysmlv2_viz::View::Sequence,
             DiagramView::Case => sysmlv2_viz::View::Case,
+            DiagramView::CaseOverview => sysmlv2_viz::View::CaseOverview,
             DiagramView::Context => sysmlv2_viz::View::Context,
             DiagramView::Mixed => sysmlv2_viz::View::Mixed,
         }
