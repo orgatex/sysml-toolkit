@@ -197,7 +197,7 @@ fn note_bodies_cannot_end_the_note() {
     assert!(!out.lines().any(terminator), "{out}");
     assert!(
         out.contains(
-            "note \"first line\\nend note\\nendnote\\nEND NOTE\\nend  note\\nsays ''end note'' and goes on \" as c1\n"
+            "note \"«doc»\\nfirst line\\nend note\\nendnote\\nEND NOTE\\nend  note\\nsays ''end note'' and goes on \" as c1\n"
         ),
         "{out}"
     );
@@ -208,7 +208,7 @@ fn note_bodies_cannot_end_the_note() {
     assert_well_formed(&out);
     assert!(!out.lines().any(terminator), "{out}");
     assert!(
-        out.contains("note \"«objective»\\naim\\nend note\\nstill the aim \" as o1\n"),
+        out.contains("note \"«objective»\\naim\\nend note\\nstill the aim \" as o1 #E3F2FD\n"),
         "{out}"
     );
     assert!(out.contains("\no1 .. n1\n"), "{out}");

@@ -206,8 +206,9 @@ impl Emitter<'_> {
         let _ = writeln!(self.edges, "{case_alias} -- {alias} : «subject»");
     }
 
-    /// The objective requirement, as a note pinned to the case — its
-    /// doc bodies say what the objective *is*, so they join the note.
+    /// The objective requirement, as a light blue note pinned to the
+    /// case — its doc bodies say what the objective *is*, so they join
+    /// the note.
     fn render_objective(&mut self, m: ElementRef, case_alias: &str) {
         let label = usage_label(self.r, m);
         let bodies: Vec<String> = self
@@ -229,7 +230,7 @@ impl Emitter<'_> {
             text.push_str("\\n");
             text.push_str(&note_text(&b));
         }
-        let _ = writeln!(self.edges, "note \"{text}\" as o{k}");
+        let _ = writeln!(self.edges, "note \"{text}\" as o{k} #E3F2FD");
         let _ = writeln!(self.edges, "o{k} .. {case_alias}");
     }
 }

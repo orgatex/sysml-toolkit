@@ -2071,7 +2071,9 @@ pub(crate) fn stereo_text(
 
 /// Floating notes for every comment/documentation body whose
 /// annotated element is on the diagram (`alias` map), attached with
-/// `..`. Note aliases are `c1…` — disjoint from the node `n…` space.
+/// `..`. A documentation note starts with `«doc»`, so that it differs
+/// from a comment and from the `«objective»` of a case. Note aliases
+/// are `c1…` — disjoint from the node `n…` space.
 pub(crate) fn emit_notes(
     r: &mut ResolvedModel,
     opts: &VizOptions,
@@ -2082,12 +2084,21 @@ pub(crate) fn emit_notes(
         return;
     }
     let mut k = 0usize;
-    for (target, body) in r.annotation_bodies() {
+    for (note, target, name, body) in r.annotation_notes() {
         let Some(a) = alias.get(&target) else {
             continue;
         };
         k += 1;
-        let _ = writeln!(out, "note \"{}\" as c{k}", note_text(&body));
+        let text = if r.element_type(note) == "Documentation" {
+            let header = match name {
+                Some(n) => format!("«doc» {n}"),
+                None => "«doc»".to_string(),
+            };
+            format!("{}\\n{}", escape(&header), note_text(&body))
+        } else {
+            note_text(&body)
+        };
+        let _ = writeln!(out, "note \"{text}\" as c{k}");
         let _ = writeln!(out, "c{k} .. {a}");
     }
 }
