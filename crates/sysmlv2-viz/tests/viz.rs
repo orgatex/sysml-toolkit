@@ -885,12 +885,34 @@ actor \"driver : Driver\" as n4
 usecase \"UnlockVehicle\" as n5 <<use case def>>
 n2 -- n3 : «subject»
 n4 -- n2
-note \"«objective»\\nget from A to B safely \" as o1
+note \"«objective»\\nget from A to B safely \" as o1 #E3F2FD
 o1 .. n2
 n2 ..> n1 : «include»
 @enduml
 ";
     assert_eq!(out, expected);
+}
+
+/// A documentation note says `«doc»`, with the name of a named doc;
+/// a comment note has no header.
+#[test]
+fn doc_notes_differ_from_comment_notes() {
+    let src = "package P {
+    part def A {
+        doc /* what A is */
+        doc Purpose /* why A exists */
+        comment /* a remark */
+    }
+}
+";
+    let mut r = resolved(src);
+    let out = plantuml(&mut r, None, &VizOptions::default());
+    assert!(out.contains("note \"«doc»\\nwhat A is \" as c1\n"), "{out}");
+    assert!(
+        out.contains("note \"«doc» Purpose\\nwhy A exists \" as c2\n"),
+        "{out}"
+    );
+    assert!(out.contains("note \"a remark \" as c3\n"), "{out}");
 }
 
 /// The mixed view puts structure, ports, connectors, behavior edges,
