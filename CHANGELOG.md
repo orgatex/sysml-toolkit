@@ -10,6 +10,36 @@
 - `viz --view case-overview`, the classic use case diagram (Rust `View::CaseOverview`, Python `"case-overview"`). The use case definitions in reach render as `usecase` nodes inside one rectangle per subject type, each actor type is one `actor` node, and each actor type and use case pair is one line; the layout is left to right, with no objective or doc notes. An untyped subject or actor is keyed by its name; one without a name shows `(subject)` or `(actor)`. A view usage whose rendering is `asClassicUseCaseDiagram` selects it. The structured graph has no emitter for it (`GraphError::UnsupportedView`).
 - `viz --view context`, the system context diagram (Rust `View::Context`, Python `"context"`). The part usages of a context render as rectangles: its own, then those of its definitions (for a usage) or written generals (for a definition), with a redefined part drawn once; the part with the most connections is the centre (`<<system>>`, the first declared on a tie); each connector with two ends on two different parts is one edge labelled by its definition, else by its name. Ports stay off the diagram: an end attaches to the part its feature chain starts at. The centre's neighbours take `-up-` and `-down-` in turn, so the other parts form a row above and a row below it; stereotypes are hidden and a bold border marks the centre. The structured graph has no emitter for it (`GraphError::UnsupportedView`).
 
+## v0.13.0
+
+### Added
+
+- Two commands for packaging a project. `kpar-index --root <dir> <files>` prints the index an archive's `.meta.json` carries: every top-level name and short name mapped to the path, relative to the root, of the file that declares it, refusing a name two files declare. `check-project --project <file> --direct <file> --transitive <file>` checks a project together with the dependency files a package manager selected, and with `--direct-only` resolves the project's files again without the transitive ones: a reference that then no longer resolves is an error saying the dependency providing it must be declared directly, with `rule` `direct-dependency` in the `--format json` report. Warnings fail the run only under `--strict`.
+
+### Changed
+
+- `convert --to kpar` writes the archive's index by the rule `kpar-index` prints. Every top-level name and short name of each file is indexed, where only the first package's name was; a file that declares no top-level name has no entry, where its file stem stood in for one; and two files declaring the same top-level name are refused, where the later file silently took the entry.
+
+## v0.12.2
+
+### Performance
+
+- The full form as text takes a fraction of the memory it took, and in WebAssembly a fraction of the time: `toFullJson` (JavaScript), `to_full_json` (Python) and `convert --to full-json` write each row as it is derived instead of building the whole document first, and the bytes are the same. For a model of 7,100 elements, 57 MB of text in the full form with the implied heritage (`closure-implied`), the WebAssembly export went from 4.2 s and 859 MiB of linear memory to 1.5 s and 369 MiB; three copies of that model, which ran out of the 2 GiB of linear memory after half a minute, export in 3.9 s at 698 MiB, and the time now grows with the model where it grew faster. The native CLI peaks at 399 MiB where it peaked at 1,004 MiB, and at 700 MiB for the three copies where it peaked at 2,561 MiB. The cost was the document value, which holds one map per reference, about 670 bytes where the text has 46, so under `closure-implied` it stood at 12 times its text. The value-returning exports are unchanged and cost what they did; full CBOR, the request envelope (`--flexo`) and a payload session whose ids are rebound after the derivation still build the value.
+
+### Added
+
+- Rust: the full form's text without the document value, `Session::to_full_json_text_with_policy(policy, TextLayout)`, and over a model `full::model_to_full_json_text_with_emission`, `full::resolved_to_full_json_text` and `full::resolved_compact_to_full_json_text`. The text is the value's, byte for byte: `TextLayout::Compact` is `serde_json::to_string` of the value and `TextLayout::Indented` its `to_string_pretty`.
+
+## v0.12.1
+
+### Added
+
+- A verification report says which element each verdict is about, so a host can look a verdict up by qualified name or id rather than by position: `Session.verify()` rows carry `qualifiedName` (null for an element without one) and `elementId`, and each satisfaction claim carries its own `elementId`, the satisfied requirement's `requirementId` and the feature `by` resolves to as `byQualifiedName` and `byId`. An assert typed by a definition is positioned over the definition's expression, where position alone could not tell the two rows apart. In Rust: `ConstraintCheck::element`, `VerifiedConstraint::element`, `SatisfactionClaim::{element, requirement_element, by_element}` and `SatisfactionInfo::{requirement, target}`.
+
+### Changed
+
+- Rust: `ConstraintCheck`, `VerifiedConstraint`, `SatisfactionClaim` and `SatisfactionInfo` carry the new public fields named above, so building one with a struct literal outside the toolkit needs them.
+
 ## v0.12.0
 
 ### Added
