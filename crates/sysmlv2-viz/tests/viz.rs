@@ -1047,6 +1047,45 @@ package Car { private import Lib::Wheel; part w : Wheel; }
     assert!(out.contains("«import»"), "{out}");
 }
 
+/// A dependency draws one «dependency» edge per client and supplier
+/// that are both on the diagram.
+#[test]
+fn tree_dependency_edges() {
+    let mut r = resolved(
+        "package Out { part def Far; }
+package P { part def A; part def B; part def C;
+    dependency Uses from A to B;
+    dependency C to A, Out::Far;
+}
+",
+    );
+    let p = r.resolve_qualified("P").unwrap();
+    let out = plantuml(&mut r, Some(p), &VizOptions::default());
+    let alias = |label: &str| {
+        let line = out
+            .lines()
+            .find(|l| l.contains(&format!("class \"{label}\"")))
+            .unwrap();
+        line.split(" as ")
+            .nth(1)
+            .unwrap()
+            .split(' ')
+            .next()
+            .unwrap()
+            .to_string()
+    };
+    let (a, b, c) = (alias("A"), alias("B"), alias("C"));
+    assert!(
+        out.contains(&format!("{a} ..> {b} : «dependency» Uses\n")),
+        "{out}"
+    );
+    assert!(
+        out.contains(&format!("{c} ..> {a} : «dependency»\n")),
+        "{out}"
+    );
+    assert_eq!(out.matches("«dependency»").count(), 2, "{out}");
+}
+
 /// Style options: line routing and the metaclass palette land in the
 /// header; link templates land on node declarations.
 #[test]

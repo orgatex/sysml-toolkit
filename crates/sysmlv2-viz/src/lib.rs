@@ -1590,6 +1590,23 @@ impl Emitter<'_> {
                 }
             }
         }
+        for d in self.r.elements_of_metaclass("Dependency") {
+            let (clients, suppliers) = self.r.dependency_ends(d);
+            let label = match self.r.element_name(d) {
+                Some(n) => format!("«dependency» {}", escape(n)),
+                None => "«dependency»".to_string(),
+            };
+            for c in &clients {
+                let Some(ca) = self.alias.get(c) else {
+                    continue;
+                };
+                for s in &suppliers {
+                    if let Some(sa) = self.alias.get(s) {
+                        let _ = writeln!(self.edges, "{ca} ..> {sa} : {label}");
+                    }
+                }
+            }
+        }
         // Library nodes drawn on demand during the pass were appended
         // to the emptied list; the walked nodes go back in front of
         // them, so the node list stays complete and in draw order.
