@@ -124,9 +124,13 @@ impl Emitter<'_> {
                 Some("ObjectiveMembership") => self.render_objective(m, &alias),
                 _ if CASES.contains(&mty) => {
                     self.render_case(m);
-                    if mty != "IncludeUseCaseUsage" {
-                        if let Some(child) = self.alias.get(&m).cloned() {
+                    if let Some(child) = self.alias.get(&m).cloned() {
+                        if mty != "IncludeUseCaseUsage" {
                             let _ = writeln!(self.edges, "{alias} *-- {child}");
+                        } else if self.drawn.contains(&m)
+                            && self.r.unresolved_referenced_feature(m).is_none()
+                        {
+                            let _ = writeln!(self.edges, "{alias} ..> {child} : «include»");
                         }
                     }
                 }
