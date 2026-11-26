@@ -100,7 +100,11 @@ impl Emitter<'_> {
         // read as written (`include 'add fuel';`).
         if ty == "IncludeUseCaseUsage" {
             let refs = crate::resolved_references(self.r, e);
-            if let Some(target) = refs.first().and_then(|chain| chain.last().copied()) {
+            let target = refs
+                .first()
+                .and_then(|chain| chain.last().copied())
+                .or_else(|| self.typing_case(e));
+            if let Some(target) = target {
                 if let Some(owner_alias) = self.r.owner(e).and_then(|o| self.alias.get(&o).cloned())
                 {
                     let target_alias = self.alias_for(target);
@@ -168,6 +172,24 @@ impl Emitter<'_> {
             "usecase \"{}\" as {alias} {stereos}{link}",
             escape(&label)
         );
+    }
+
+    /// The case definition that types an include with nothing of its
+    /// own but comments: the include is that definition.
+    fn typing_case(&mut self, e: ElementRef) -> Option<ElementRef> {
+        if self.r.unresolved_referenced_feature(e).is_some()
+            || self
+                .r
+                .owned_members(e)
+                .into_iter()
+                .any(|m| !matches!(self.r.element_type(m), "Documentation" | "Comment"))
+        {
+            return None;
+        }
+        match self.r.typings(e)[..] {
+            [t] if CASES.contains(&self.r.element_type(t)) => Some(t),
+            _ => None,
+        }
     }
 
     /// A case referenced before (or without) its own traversal still

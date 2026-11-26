@@ -893,13 +893,36 @@ n2 ..> n1 : «include»
     assert_eq!(out, expected);
 }
 
-/// An `include use case` that references no case is a case of its own,
+/// An `include use case` typed by a case definition, with nothing of
+/// its own but its doc, includes that definition: one node for it.
+#[test]
+fn case_view_includes_the_definition_of_a_typed_include() {
+    let mut r = resolved(
+        "package Ops {
+    use case def Drive { include use case unlock : Unlock { doc /* D */ } }
+    use case def Unlock { actor a; }
+}
+",
+    );
+    let out = plantuml(&mut r, None, &view_opts(View::Case));
+    let expected = "@startuml
+usecase \"Drive\" as n1 <<use case def>>
+usecase \"Unlock\" as n2 <<use case def>>
+actor \"a\" as n3
+n1 ..> n2 : «include»
+n3 -- n2
+@enduml
+";
+    assert_eq!(out, expected);
+}
+
+/// An `include use case` with members of its own is a case of its own,
 /// and its owner includes it.
 #[test]
 fn case_view_includes_an_inline_include() {
     let mut r = resolved(
         "package Ops {
-    use case def Drive { include use case unlock : Unlock { doc /* D */ } }
+    use case def Drive { include use case unlock : Unlock { actor a; } }
     use case def Unlock;
 }
 ",
@@ -908,10 +931,10 @@ fn case_view_includes_an_inline_include() {
     let expected = "@startuml
 usecase \"Drive\" as n1 <<use case def>>
 usecase \"unlock : Unlock\" as n2 <<include use case>>
-usecase \"Unlock\" as n3 <<use case def>>
+actor \"a\" as n3
+usecase \"Unlock\" as n4 <<use case def>>
+n3 -- n2
 n1 ..> n2 : «include»
-note \"«doc»\\nD \" as c1
-c1 .. n2
 @enduml
 ";
     assert_eq!(out, expected);
