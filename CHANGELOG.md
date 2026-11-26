@@ -4,6 +4,7 @@
 
 ### Added
 
+- The case view (`viz --view case`, Rust `View::Case`) draws an `include use case` that a case definition types, and that owns nothing but comments, as an `«include»` edge to that definition, with no node of its own (`include use case a : A;`). Before, it drew a second node for the same use case.
 - The case view (`viz --view case`, Rust `View::Case`) draws a dashed `«include»` edge from a case to an `include use case` that it owns and that references no case (`include use case a : A { … }`). Before, such an include was a node with no edge. An include whose reference does not resolve still draws no edge.
 - The tree view (`viz`, Rust `View::Tree`) draws a dependency as a dashed `«dependency»` edge from each client to each supplier, labelled with the name of the dependency. An end that is not on the diagram draws no edge.
 - `viz --view case-overview`, the classic use case diagram (Rust `View::CaseOverview`, Python `"case-overview"`). The use case definitions in reach render as `usecase` nodes inside one rectangle per subject type, each actor type is one `actor` node, and each actor type and use case pair is one line; the layout is left to right, with no objective or doc notes. An untyped subject or actor is keyed by its name; one without a name shows `(subject)` or `(actor)`. A view usage whose rendering is `asClassicUseCaseDiagram` selects it. The structured graph has no emitter for it (`GraphError::UnsupportedView`).
