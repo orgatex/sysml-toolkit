@@ -893,6 +893,30 @@ n2 ..> n1 : «include»
     assert_eq!(out, expected);
 }
 
+/// An `include use case` that references no case is a case of its own,
+/// and its owner includes it.
+#[test]
+fn case_view_includes_an_inline_include() {
+    let mut r = resolved(
+        "package Ops {
+    use case def Drive { include use case unlock : Unlock { doc /* D */ } }
+    use case def Unlock;
+}
+",
+    );
+    let out = plantuml(&mut r, None, &view_opts(View::Case));
+    let expected = "@startuml
+usecase \"Drive\" as n1 <<use case def>>
+usecase \"unlock : Unlock\" as n2 <<include use case>>
+usecase \"Unlock\" as n3 <<use case def>>
+n1 ..> n2 : «include»
+note \"«doc»\\nD \" as c1
+c1 .. n2
+@enduml
+";
+    assert_eq!(out, expected);
+}
+
 /// A documentation note says `«doc»`, with the name of a named doc;
 /// a comment note has no header.
 #[test]
